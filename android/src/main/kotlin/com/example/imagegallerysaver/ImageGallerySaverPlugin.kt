@@ -69,9 +69,10 @@ class ImageGallerySaverPlugin(private val registrar: Registrar): MethodCallHandl
       val uri = Uri.fromFile(file)
       context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
       bmp.recycle()
-      SaveResultModel(uri.toString().isNotEmpty(), uri.toString(), null).toHashMap()
+      val fileId = UriUtil.convertUriToPath(context, uri)
+      SaveResultModel(uri.toString().isNotEmpty(), fileId, uri.toString(), null).toHashMap()
     } catch (e: IOException) {
-      SaveResultModel(false, null, e.toString()).toHashMap()
+      SaveResultModel(false, null, null, e.toString()).toHashMap()
     }
   }
 
@@ -84,9 +85,10 @@ class ImageGallerySaverPlugin(private val registrar: Registrar): MethodCallHandl
 
       val uri = Uri.fromFile(file)
       context.sendBroadcast(Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri))
-      SaveResultModel(uri.toString().isNotEmpty(), uri.toString(), null).toHashMap()
+      val fileId = UriUtil.convertUriToPath(context, uri)
+      SaveResultModel(uri.toString().isNotEmpty(), fileId, uri.toString(), null).toHashMap()
     } catch (e: IOException) {
-      SaveResultModel(false, null, e.toString()).toHashMap()
+      SaveResultModel(false, null, null, e.toString()).toHashMap()
     }
   }
 
@@ -111,11 +113,13 @@ class ImageGallerySaverPlugin(private val registrar: Registrar): MethodCallHandl
 }
 
 class SaveResultModel (var isSuccess: Boolean,
+                   var fileId: String? = null,
                    var filePath: String? = null,
                    var errorMessage: String? = null) {
   fun toHashMap(): HashMap<String, Any?> {
     val hashMap = HashMap<String, Any?>()
     hashMap["isSuccess"] = isSuccess
+    hashMap["fileId"] = fileId
     hashMap["filePath"] = filePath
     hashMap["errorMessage"] = errorMessage
     return hashMap
